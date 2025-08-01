@@ -3,6 +3,7 @@ package com.jammming.backend.controllers;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.view.RedirectView;
 
 import com.jammming.backend.services.SpotifyLoginService;
 
@@ -18,7 +19,7 @@ public class SpotifyLoginController {
     
     // builds url and returns string url so the front-end can redirect users to spotify's auth page
     @GetMapping("/login")
-    public String getLoginUrl() {
+    public RedirectView getLoginUrl() {
     
         return this.spotifyLoginService.getLoginUrl();
     }
