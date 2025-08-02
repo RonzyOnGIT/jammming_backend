@@ -20,8 +20,9 @@ public class SpotifyLoginController {
     // builds url and returns string url so the front-end can redirect users to spotify's auth page
     @GetMapping("/login")
     public RedirectView getLoginUrl() {
-    
+
         return this.spotifyLoginService.getLoginUrl();
+        
     }
     
 }
