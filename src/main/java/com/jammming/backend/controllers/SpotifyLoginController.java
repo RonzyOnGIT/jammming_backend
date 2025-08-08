@@ -54,12 +54,13 @@ public class SpotifyLoginController {
     @GetMapping("/redirect")
     public RedirectView handleSpotifyRedirect(@RequestParam(value = "code", required = false) String code, @RequestParam(value = "state", required = true) String state, @RequestParam(value = "error", required = false) String error, HttpServletRequest request) {
         
+        // gonna have to use JWT or something to encrypt this and better manage the state
         // state from redirect does not match the original state that was passed into the original redirect, fishy stuff
-        if (request.getSession().getAttribute("spotify_state") != state) {
+        if (!state.equals(request.getSession().getAttribute("spotify_state"))) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid state parameter");
         }
 
-        StringBuilder redirectUrl = new StringBuilder("http://localhost:3000");
+        StringBuilder redirectUrl = new StringBuilder("http://localhost:5173/");
 
         // user accepted conditions and matching states
         if (code != null) {
