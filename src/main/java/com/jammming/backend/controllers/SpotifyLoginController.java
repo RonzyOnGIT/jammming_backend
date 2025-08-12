@@ -20,8 +20,6 @@ import com.jammming.backend.services.SpotifyLoginService;
 // after using logs in to spotify redirect back to another redirect
 // in the endpoint, redirect user back to spotify using logged in or something by doing return new RedirectView("");
 
-
-@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("/api")
 public class SpotifyLoginController {
@@ -51,29 +49,15 @@ public class SpotifyLoginController {
 
     }
 
+    // clean this up and throw logic in the service class
     @GetMapping("/redirect")
     public RedirectView handleSpotifyRedirect(@RequestParam(value = "code", required = false) String code, @RequestParam(value = "state", required = true) String state, @RequestParam(value = "error", required = false) String error, HttpServletRequest request) {
         
-        // gonna have to use JWT or something to encrypt this and better manage the state
-        // state from redirect does not match the original state that was passed into the original redirect, fishy stuff
-        if (!state.equals(request.getSession().getAttribute("spotify_state"))) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid state parameter");
-        }
-
-        StringBuilder redirectUrl = new StringBuilder("http://localhost:5173/");
-
-        // user accepted conditions and matching states
-        if (code != null) {
-            // redirect back to frontend application with "/logged_in" url or something to show that logged in with returned code 
-            redirectUrl.append("?code=").append(code);
-        }
-
-        // some error happened or user declined conditions
-        if (error != null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, error);
-        }
-        
-        return new RedirectView(redirectUrl.toString());
+        try {
+            return this.spotifyLoginService.handleLoginRedirect(code, state, error, request);
+        } catch (IllegalStateException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+        }   
 
     }
 
