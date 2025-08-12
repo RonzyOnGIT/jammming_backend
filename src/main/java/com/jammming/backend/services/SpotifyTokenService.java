@@ -1,6 +1,8 @@
 package com.jammming.backend.services;
 
 import com.jammming.backend.services.SpotifyTokenResponse;
+import com.jammming.backend.repositories.UserRepository;
+import com.jammming.backend.entities.User;
 
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -20,6 +22,11 @@ import org.springframework.http.ResponseEntity;
 public class SpotifyTokenService {
 
     private final RestTemplate restTemplate = new RestTemplate();
+    private final UserRepository userRepository;
+
+    public SpotifyTokenService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Value("${clientId}")
     private String clientId;
@@ -57,11 +64,17 @@ public class SpotifyTokenService {
 
         try {
             
+            // response will be some json object which will be serialized into SpotifyTokenResponse, then wrap that object with a HTTP response body
             ResponseEntity<SpotifyTokenResponse> response = restTemplate.postForEntity(url, requestEntity, SpotifyTokenResponse.class);
+
             SpotifyTokenResponse tokens = response.getBody();
 
             if (tokens != null && tokens.getAccess_token() != null) {
-                // TODO: Save tokens somewhere
+                User user = new User();
+                user.setAccessToken(tokens.getAccess_token());
+                user.setExpiresIn(tokens.getExpires_in());
+                user.setRefreshToken(tokens.getRefresh_token());
+                this.userRepository.save(user);
                 return true;  // Token exchange succeeded
             } else {
                 return false;
