@@ -24,7 +24,7 @@ import com.jammming.backend.services.SpotifyLoginService;
 @RequestMapping("/api")
 public class SpotifyLoginController {
 
-    private SpotifyLoginService spotifyLoginService;
+    private final SpotifyLoginService spotifyLoginService;
 
     public SpotifyLoginController(SpotifyLoginService spotifyLoginService) {
         this.spotifyLoginService = spotifyLoginService;
