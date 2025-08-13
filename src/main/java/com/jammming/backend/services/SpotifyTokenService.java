@@ -8,7 +8,12 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 
 import java.nio.charset.StandardCharsets;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Base64;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -36,7 +41,9 @@ public class SpotifyTokenService {
 
 
     // front end will make a post request and in the controller get the code string to exchange it with a key or something
-    public boolean exchangeCodeForTokens(String code) {
+    public Map<String, Long> exchangeCodeForTokens(String code) {
+
+        Map<String, Long> res = new HashMap<>();
 
         // in here will have to make a post request to /api/token endpoint
         String url = "https://accounts.spotify.com/api/token";
@@ -74,19 +81,36 @@ public class SpotifyTokenService {
                 user.setAccessToken(tokens.getAccess_token());
                 user.setExpiresIn(tokens.getExpires_in());
                 user.setRefreshToken(tokens.getRefresh_token());
-                this.userRepository.save(user);
-                return true;  // Token exchange succeeded
+
+                long secondsSinceEpoch = ZonedDateTime.now(ZoneOffset.UTC).toEpochSecond();
+                long expireTime = secondsSinceEpoch + tokens.getExpires_in() - 5;
+
+                user.setExpireTime(expireTime);
+
+                User savedUser = this.userRepository.save(user);
+                res.put("userId", savedUser.getId());
+                res.put("expireTime", savedUser.getExpireTime());
+                return res;
             } else {
-                return false;
+                return null;
             }
 
         } catch (Exception e) {
 
             e.printStackTrace();
-            return false;
+            return null;
 
         }
 
+    }
+
+    public boolean deleteUserById(Long id) {
+        if (this.userRepository.existsById(id)) {
+            this.userRepository.deleteById(id);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     

@@ -32,4 +32,8 @@ public class User {
     @Column(name = "REFRESH_TOKEN", length = 512)
     private String refreshToken;
 
+    // the time in seconds when token expires
+    @Column(name = "EXPIRE_TIME")
+    private Long expireTime;
+
 }
