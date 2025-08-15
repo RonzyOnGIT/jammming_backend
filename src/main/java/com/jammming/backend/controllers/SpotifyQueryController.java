@@ -30,8 +30,6 @@ public class SpotifyQueryController {
         this.spotifyQueryService = spotifyQueryService;
     }
     
-    // the frontend will make a call passing in the id, as well as the song name, so have to do that
-    // here want to return a json object {} with the fields that we care about being :
     // name={song.name} artist={song.artists} key={song.id} preview={song.preview_url} index={index} addSongToPlaylist={addSongToPlaylist} id={song.id} removeSongFromPlaylist={removeFromPlaylist} playlistSongs={playlistSongs} uri={song.uri}
     @GetMapping("/songs")
     public ResponseEntity<List<Map<String, Object>>> fetchSongs(@RequestParam(value = "id", required = true) Long id, @RequestParam(value = "songName", required = true) String songName) {
@@ -59,50 +57,16 @@ public class SpotifyQueryController {
     }
 
     // want to make a post request here to an endpoint, in which the backend (here) will handle retrieving user's spotify id to use that to get playlist, つまり most of the work is donw here in backend
-    @PostMapping()
+    @PostMapping("/playlist")
     public ResponseEntity<String> createPlaylist(@RequestBody Map<String, Serializable> payload) {
 
-        return new ResponseEntity<>(null);
+        String response = this.spotifyQueryService.createPlaylist(payload);
 
-        // I need to call the service method to do something
-
-        // first verify that user exists
-
-        // this.SpotifyQueryService.createPlaylist()
-
-
-    }
-
-
-
-}
-
-
-/*
-    endpoint = https://api.spotify.com/v1/me
-    export const getUsersProfileId = async (accessToken) => {
-    const endpoint = baseUrl + 'me';
-
-    const fetchOptions = {
-        method: 'GET',
-        headers: {'Authorization': 'Bearer ' + accessToken}
-    };
-
-    try {
-        const response = await fetch(endpoint, fetchOptions);
-
-        if (!response.ok) {
-            throw new Error(`error status: ${response.status}`)
+        if (response.equals("ok")) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to create playlist");
         }
-
-        const data = await response.json();
-        return data.id;
-
-    } catch (err) {
-        console.log(err);
-        return null;
     }
-
-
 }
- */
+

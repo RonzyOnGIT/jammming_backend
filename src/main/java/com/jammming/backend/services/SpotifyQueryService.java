@@ -16,6 +16,7 @@ import java.util.Optional;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -120,7 +121,7 @@ public class SpotifyQueryService {
 
                 body.put("name", payload.get("name"));
                 body.put("description", payload.get("description"));
-                body.put("public", true);
+                body.put("public", payload.get("public"));
 
                 HttpEntity<Map<String, Object>> playlistEntity = new HttpEntity<>(body, headers);
 
@@ -128,10 +129,7 @@ public class SpotifyQueryService {
 
                 Playlist newPlaylist = playlistResponse.getBody();
 
-
-
                 // now we populate the newly created playlist
-
                 String populatePlaylistEndpoint = "https://api.spotify.com/v1/playlists/" + newPlaylist.getId() + "/tracks";
 
                 HttpHeaders newHeaders = new HttpHeaders();
@@ -145,10 +143,14 @@ public class SpotifyQueryService {
                 
                 uriArraysBody.put("uris", uris);
 
-                HttpEntity<Map<String, Object>> playlistCreatedEntity = new HttpEntity<>(body, newHeaders);
+                HttpEntity<Map<String, Object>> playlistCreatedEntity = new HttpEntity<>(uriArraysBody, newHeaders);
                 ResponseEntity<String> finalResponse = restTemplate.postForEntity(populatePlaylistEndpoint, playlistCreatedEntity, String.class);
             
-                return finalResponse.getBody();
+                if (finalResponse.getStatusCode() == HttpStatus.CREATED) {
+                    return "ok";
+                } else {
+                    return null;
+                }
 
             } catch (Exception e) {
                 e.printStackTrace();
