@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -57,10 +59,19 @@ public class SpotifyQueryController {
     }
 
     // want to make a post request here to an endpoint, in which the backend (here) will handle retrieving user's spotify id to use that to get playlist, つまり most of the work is donw here in backend
-    // @PostMapping()
-    // public ResponseEntity<String> createPlaylist() {
+    @PostMapping()
+    public ResponseEntity<String> createPlaylist(@RequestBody Map<String, Serializable> payload) {
 
-    // }
+        return new ResponseEntity<>(null);
+
+        // I need to call the service method to do something
+
+        // first verify that user exists
+
+        // this.SpotifyQueryService.createPlaylist()
+
+
+    }
 
 
 
